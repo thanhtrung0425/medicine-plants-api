@@ -45,16 +45,16 @@ class UploadDataFromCSV(APIView):
 class LoadData(viewsets.ViewSet):
     #load to redis
     def loadData(self, request, *args, **kwargs):
-        # data = cache.get('medicine_plants')
-        # if data is not None:
-        #     return Response(data)
-        # else:
+        data = redis_instance.get('medicine_plants')
+        if data is not None:
+            return Response(json.loads(data), status=status.HTTP_200_OK)
+        else:
             try:
                 items = MedicinePlants.objects.all()
                 serializers = MedicinePlantSerializers(items, many=True)
                 json_data = json.dumps(serializers.data)
-                cache.set('medicine_plants', json, 86400)
-                return Response(json_data, status=status.HTTP_200_OK)
+                redis_instance.set('medicine_plants', json_data, 86400)
+                return Response(serializers.data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({'success': False, 'message': e.__class__})
 
@@ -66,13 +66,11 @@ class GetItemMedicinePlants(APIView):
         data = cache.get(item_id)
         if data is not None:
             serializers = MedicinePlantSerializers(data)
-            json_data = json.dumps(serializers.data)
-            return Response(json_data)
+            return Response(serializers.data)
         else:
             items = MedicinePlants.objects.filter(name__contains=item_id)
             serializers = MedicinePlantSerializers(items)
-            json_data = json.dumps(serializers.data)
-            return Response(json_data)
+            return Response(serializers.data)
         
 class ClearCache(APIView):
     def get(self, request, *args, **kwargs):
