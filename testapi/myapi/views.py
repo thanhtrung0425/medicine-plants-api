@@ -46,10 +46,10 @@ class UploadDataFromCSV(APIView):
 class LoadData(viewsets.ViewSet):
     #load to redis
     def loadData(self, request, *args, **kwargs):
-        data = cache.get('medicine_plants')
-        if data is not None:
-            return Response(data)
-        else:
+        # data = cache.get('medicine_plants')
+        # if data is not None:
+        #     return Response(data)
+        # else:
             try:
                 items = MedicinePlants.objects.all()
                 serializers = MedicinePlantSerializers(items, many=True)
