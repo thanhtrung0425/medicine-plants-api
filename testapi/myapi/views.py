@@ -26,10 +26,9 @@ class GetAllMedicinePlants(APIView):
 class UploadDataFromCSV(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            with open('/home/thanhtrung/Desktop/DOAN/PBL6/testapi/testapi/myapi/data.csv', 'r') as fileCSV:
+            with open('/home/thanhtrung0425/app-api/medicine-plants-api/testapi/myapi/data.csv', 'r') as fileCSV:
                 reader = csv.reader(fileCSV)
                 items = list(reader)
-                originData = MedicinePlants.objects.all()
                 for item in items[1:]:
                     if MedicinePlants.objects.filter(id= item[0]).exists:
                         continue
@@ -53,8 +52,9 @@ class LoadData(viewsets.ViewSet):
             try:
                 items = MedicinePlants.objects.all()
                 serializers = MedicinePlantSerializers(items, many=True)
-                cache.set('medicine_plants', serializers.data, 86400)
-                return Response(serializers.data)
+                json_data = json.dumps(serializers.data)
+                cache.set('medicine_plants', json, 86400)
+                return Response(json_data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({'success': False, 'message': e.__class__})
 
@@ -66,11 +66,13 @@ class GetItemMedicinePlants(APIView):
         data = cache.get(item_id)
         if data is not None:
             serializers = MedicinePlantSerializers(data)
-            return Response(serializers.data)
+            json_data = json.dumps(serializers.data)
+            return Response(json_data)
         else:
             items = MedicinePlants.objects.filter(name__contains=item_id)
             serializers = MedicinePlantSerializers(items)
-            return Response(serializers.data)
+            json_data = json.dumps(serializers.data)
+            return Response(json_data)
         
 class ClearCache(APIView):
     def get(self, request, *args, **kwargs):
