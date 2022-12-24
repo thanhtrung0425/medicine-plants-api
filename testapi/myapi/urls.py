@@ -1,6 +1,4 @@
-from django.urls import include, path
-from django.contrib import admin
-from rest_framework import routers
+from django.urls import path
 from . import views
 
 
@@ -10,5 +8,5 @@ urlpatterns = [
     path('upload/', views.UploadDataFromCSV.as_view()),
     path('clean-cache/', views.ClearCache.as_view()),
     path('medicine-plants/', views.LoadData.as_view({'get':'loadData'})),
-    #path('medicine-plants/<str:id>', views.LoadData.as_view({'get': 'getMedicinePlant'})),
+    path('medicine-plant/id=<str:id>', views.GetItemMedicinePlants.as_view()),
 ]
